@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="eng">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Squad Scope</title>
     @vite(['resources/css/welcome.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
@@ -118,24 +120,25 @@
                 </div>
                 <div class="team-form-container">
                     <div class="team-form">
-                        <h2><img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Team-form Icon">Check Your Team</h2>
+                        <h2><img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Check Your Team Icon"> Check Your Team</h2>
                         <div class="player-input">
-                            <input type="text" placeholder="Player name">
-                            <button>Add</button>
+                            <input type="text" id="player-name-1" placeholder="Player name">
+                            <button id="add-player-1">Add</button>
                         </div>
                         <div class="player-input">
-                            <input type="text" placeholder="Player name">
-                            <button>Add</button>
+                            <input type="text" id="player-name-2" placeholder="Player name">
+                            <button id="add-player-2">Add</button>
                         </div>
                         <div class="player-input">
-                            <input type="text" placeholder="Player name">
-                            <button>Add</button>
+                            <input type="text" id="player-name-3" placeholder="Player name">
+                            <button id="add-player-3">Add</button>
                         </div>
                         <div class="player-input">
-                            <input type="text" placeholder="Player name">
-                            <button>Add</button>
+                            <input type="text" id="player-name-4" placeholder="Player name">
+                            <button id="add-player-4">Add</button>
                         </div>
                         <button class="apply-button">Apply</button>
+                        <ul id="players-list"></ul>
                     </div>
                 </div>
             </div>
@@ -179,6 +182,62 @@
 
             characterImage.style.transform = `translate(-1%, 0) translate(${moveX}px, ${moveY}px)`;
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addButtons = document.querySelectorAll('button[id^="add-player"]');
+        addButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const index = button.id.split('-').pop();
+            const input = document.getElementById(`player-name-${index}`);
+            const playerName = input.value.trim();
+
+            if (playerName === '') return;
+
+            fetch('/check-players', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ playerNames: [playerName] })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.players && data.players[playerName]) {
+                    const player = data.players[playerName];
+                    addPlayerToList(player, index);
+                    button.disabled = true;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+
+    function addPlayerToList(player, index) {
+        const listElement = document.createElement('li');
+        listElement.innerHTML = `
+            <div class="player-details">
+                <strong>${player.name}</strong> (${player.shardId})
+                <button class="remove-player" data-index="${index}">Remove</button>
+            </div>
+        `;
+        document.getElementById('players-list').appendChild(listElement);
+
+        listElement.querySelector('.remove-player').addEventListener('click', function() {
+            removePlayerFromList(this);
+        });
+    }
+
+    function removePlayerFromList(button) {
+        const index = button.getAttribute('data-index');
+        const listItem = button.closest('li');
+        listItem.remove();
+        document.getElementById(`add-player-${index}`).disabled = false;
+        document.getElementById(`player-name-${index}`).value = '';
+    }
+});
+     
     </script>
 </body>
 </html>
