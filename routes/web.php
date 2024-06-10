@@ -2,7 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Auth\SocialAuthController;
 
+Route::get('auth/xbox', [SocialAuthController::class, 'redirectToXbox']);
+Route::get('auth/xbox/callback', [SocialAuthController::class, 'handleXboxCallback']);
+Route::get('auth/steam', [SocialAuthController::class, 'redirectToSteam']);
+Route::get('auth/steam/callback', [SocialAuthController::class, 'handleSteamCallback']);
 
 Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register.show');
 Route::post('/register', [UserController::class, 'store'])->name('register.store');

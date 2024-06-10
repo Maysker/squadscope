@@ -84,6 +84,10 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+            <p>Please choose a provider:</p>
+            <a href="{{ url('auth/steam') }}" class="btn btn-primary">Register with Steam</a>
+            <a href="{{ url('auth/xbox') }}" class="btn btn-primary">Register with Xbox</a>
+            <hr>
             <form action="{{ route('register.store') }}" method="POST">
               @csrf
               <div class="mb-3">
