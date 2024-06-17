@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
+use App\Models\Team;
+use App\Models\Player;
 
 class PlayerController extends Controller
 {
@@ -17,7 +19,7 @@ class PlayerController extends Controller
                 'Authorization' => 'Bearer ' . config('services.pubg.api_key'),
                 'Accept' => 'application/vnd.api+json'
             ],
-            'verify' => storage_path('cacert.pem')  // Путь к файлу сертификата
+            'verify' => storage_path('cacert.pem')
         ]);
     }
 
@@ -42,19 +44,16 @@ class PlayerController extends Controller
 
             $data = json_decode($response->getBody()->getContents(), true);
             if (empty($data['data'])) {
-                continue;  // Пропуск если нет данных
+                continue;
             }
 
-            // Сохранение информации о игроке
             $playerInfo = [
                 'id' => $data['data'][0]['id'],
                 'name' => $data['data'][0]['attributes']['name'],
                 'shardId' => $data['data'][0]['attributes']['shardId'],
-                // Добавьте другие необходимые атрибуты
             ];
             $playerDetails[$name] = $playerInfo;
 
-            // Сохранение ID матчей
             $playerMatches[$name] = array_column($data['data'][0]['relationships']['matches']['data'], 'id');
         }
 
@@ -77,5 +76,32 @@ class PlayerController extends Controller
             $firstPlayerMatches = array_intersect($firstPlayerMatches, $matches);
         }
         return $firstPlayerMatches;
+    }
+
+    public function saveTeam(Request $request)
+    {
+        $validated = $request->validate([
+            'teamName' => 'required|string|max:255',
+            'players' => 'required|array|min:2',
+            'players.*.id' => 'required|string',
+            'players.*.name' => 'required|string',
+            'players.*.shardId' => 'required|string',
+        ]);
+
+        // Создание команды
+        $team = Team::create([
+            'name' => $validated['teamName'],
+            'owner_id' => auth()->id(),
+        ]);
+
+        // Добавление игроков в команду
+        foreach ($validated['players'] as $player) {
+            Player::create([
+                'name' => $player['name'],
+                'team_id' => $team->id,
+            ]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }
