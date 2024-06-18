@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('telemetry', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('match_id')->constrained('matches');
+            $table->foreignId('match_id')->constrained('game_matches');
             $table->foreignId('player_id')->constrained('players');
             $table->string('event_type');
             $table->foreignId('target_player_id')->nullable()->constrained('players');

@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('matches', function (Blueprint $table) {
+        Schema::create('game_matches', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date');
             $table->foreignId('team_id')->constrained('teams');
+            $table->dateTime('date');
             $table->integer('placement');
             $table->integer('kills');
             $table->integer('damage');
@@ -20,6 +20,6 @@ return new class extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists('matches');
+        Schema::dropIfExists('game_matches');
     }
 };

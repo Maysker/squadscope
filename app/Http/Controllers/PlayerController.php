@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
+use App\Models\Team;
+use App\Models\Player;
+use App\Models\PlayerMatch;
 
 class PlayerController extends Controller
 {
@@ -17,7 +20,7 @@ class PlayerController extends Controller
                 'Authorization' => 'Bearer ' . config('services.pubg.api_key'),
                 'Accept' => 'application/vnd.api+json'
             ],
-            'verify' => storage_path('cacert.pem')  // Путь к файлу сертификата
+            'verify' => storage_path('cacert.pem')
         ]);
     }
 
@@ -42,19 +45,16 @@ class PlayerController extends Controller
 
             $data = json_decode($response->getBody()->getContents(), true);
             if (empty($data['data'])) {
-                continue;  // Пропуск если нет данных
+                continue;
             }
 
-            // Сохранение информации о игроке
             $playerInfo = [
                 'id' => $data['data'][0]['id'],
                 'name' => $data['data'][0]['attributes']['name'],
                 'shardId' => $data['data'][0]['attributes']['shardId'],
-                // Добавьте другие необходимые атрибуты
             ];
             $playerDetails[$name] = $playerInfo;
 
-            // Сохранение ID матчей
             $playerMatches[$name] = array_column($data['data'][0]['relationships']['matches']['data'], 'id');
         }
 
@@ -77,5 +77,41 @@ class PlayerController extends Controller
             $firstPlayerMatches = array_intersect($firstPlayerMatches, $matches);
         }
         return $firstPlayerMatches;
+    }
+
+    public function saveTeam(Request $request)
+    {
+        $validated = $request->validate([
+            'teamName' => 'required|string|max:255',
+            'players' => 'required|array|min:2',
+            'players.*.id' => 'required|string',
+            'players.*.name' => 'required|string',
+            'players.*.shardId' => 'required|string',
+            'players.*.matches' => 'required|array',
+            'players.*.matches.*' => 'required|string',
+        ]);
+
+        // Creating a team
+        $team = Team::create([
+            'name' => $validated['teamName'],
+            'owner_id' => auth()->id(),
+        ]);
+
+        // Adding Players and their Matches to a Team
+        foreach ($validated['players'] as $player) {
+            $newPlayer = Player::create([
+                'name' => $player['name'],
+                'team_id' => $team->id,
+            ]);
+
+            foreach ($player['matches'] as $matchId) {
+                PlayerMatch::create([
+                    'player_id' => $newPlayer->id,
+                    'match_id' => $matchId,
+                ]);
+            }
+        }
+
+        return response()->json(['success' => true]);
     }
 }

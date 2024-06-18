@@ -1,0 +1,133 @@
+.team-form-container {
+    margin-left: 220px; /* Add margin to separate from the flight board */
+    width: 100%;
+    max-width: 400px;
+    z-index: 3;
+    margin-top: 20px;
+}
+
+.team-form {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.team-form-icon {
+    width: 36px; /* Customize the icon size as you wish */
+    height: auto;
+    vertical-align: middle;
+    margin-right: 10px; /* Add indentation so that the icon is not pressed against the text */
+    filter: invert(1);
+}
+
+.team-form h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ffc107;
+    margin-top: 10px;
+}
+
+.player-input {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.player-input input {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.player-input button {
+    padding: 5px 15px;
+    font-size: 14px;
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.team-name-input {
+    margin-bottom: 10px;
+}
+
+#team-name {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px; 
+    margin-bottom: 10px;
+}
+
+.player-input button:hover {
+    background-color: #e6b006;
+}
+
+.save-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.save-button:hover {
+    background-color: #e6b006;
+}
+
+#players-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #fff;
+    text-align: center;
+}
+
+#players-list li {
+    border: 1px solid #ccc;
+    margin-top: 8px;
+    padding: 8px;
+    list-style-type: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.player-details {
+    flex: 1;
+}
+
+.remove-player {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.remove-player:hover {
+    background-color: #ff1a1a;
+}
