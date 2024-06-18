@@ -40,18 +40,4 @@ return [
         ],
     ],
 
-    'social' => [
-        'steam' => [
-            'client_id' => env('STEAM_CLIENT_ID'),
-            'client_secret' => env('STEAM_CLIENT_SECRET'),
-            'redirect' => env('STEAM_REDIRECT_URL'),
-        ],
-        'xbox' => [
-            'client_id' => env('XBOX_CLIENT_ID'),
-            'client_secret' => env('XBOX_CLIENT_SECRET'),
-            'redirect' => env('XBOX_REDIRECT_URL'),
-        ],
-    ],
-    
-
 ];
