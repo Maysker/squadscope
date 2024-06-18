@@ -7,6 +7,12 @@ Route::get('/team-management', function () {
     return view('team-management');
 })->name('team.management');
 
+Route::get('/match-details', function () {
+    return view('match-details');
+});
+
+Route::get('/team/{teamId}/matches', [PlayerController::class, 'showMatchDetails'])->name('team.matches');
+
 Route::post('/check-players', [PlayerController::class, 'checkPlayers'])->name('team.checkPlayers');
 Route::post('/save-team', [PlayerController::class, 'saveTeam'])->name('team.save');
 

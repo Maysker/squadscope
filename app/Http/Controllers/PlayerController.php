@@ -79,6 +79,51 @@ class PlayerController extends Controller
         return $firstPlayerMatches;
     }
 
+    public function getCommonMatches($teamId)
+    {
+        $matches = PlayerMatch::select('match_id')
+                    ->whereIn('player_id', function($query) use ($teamId) {
+                        $query->select('id')
+                            ->from('players')
+                            ->where('team_id', $teamId);
+                    })
+                    ->groupBy('match_id')
+                    ->havingRaw('COUNT(DISTINCT player_id) > 1')
+                    ->get();
+
+        return $matches;
+    }
+
+    public function getMatchDetails($matchId)
+    {
+        $response = $this->client->request('GET', "shards/steam/matches/{$matchId}");
+        if ($response->getStatusCode() != 200) {
+            return null;
+        }
+        $data = json_decode($response->getBody()->getContents(), true);
+        return $data;
+    }
+
+    public function showMatchDetails($teamId)
+    {
+        $matches = $this->getCommonMatches($teamId);
+        $matchDetails = [];
+        foreach ($matches as $match) {
+            $matchDetail = $this->getMatchDetails($match->match_id);
+            if ($matchDetail) {
+                $matchDetails[] = $matchDetail;
+            }
+        }
+
+        // Limit to the last 4 matches
+        $matchDetails = array_slice($matchDetails, 0, 4);
+
+        // Get team player names
+        $teamPlayers = Player::where('team_id', $teamId)->pluck('name')->toArray();
+
+        return view('match-details', ['matchDetails' => $matchDetails, 'teamPlayers' => $teamPlayers]);
+    }
+
     public function saveTeam(Request $request)
     {
         $validated = $request->validate([
