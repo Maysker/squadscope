@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\Team;
 use App\Models\Player;
+use App\Models\PlayerMatch;
 
 class PlayerController extends Controller
 {
@@ -86,20 +87,29 @@ class PlayerController extends Controller
             'players.*.id' => 'required|string',
             'players.*.name' => 'required|string',
             'players.*.shardId' => 'required|string',
+            'players.*.matches' => 'required|array',
+            'players.*.matches.*' => 'required|string',
         ]);
 
-        // Создание команды
+        // Creating a team
         $team = Team::create([
             'name' => $validated['teamName'],
             'owner_id' => auth()->id(),
         ]);
 
-        // Добавление игроков в команду
+        // Adding Players and their Matches to a Team
         foreach ($validated['players'] as $player) {
-            Player::create([
+            $newPlayer = Player::create([
                 'name' => $player['name'],
                 'team_id' => $team->id,
             ]);
+
+            foreach ($player['matches'] as $matchId) {
+                PlayerMatch::create([
+                    'player_id' => $newPlayer->id,
+                    'match_id' => $matchId,
+                ]);
+            }
         }
 
         return response()->json(['success' => true]);

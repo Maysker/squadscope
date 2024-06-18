@@ -22,117 +22,113 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    console.log("Document loaded");
+            console.log("Document loaded");
 
-    const addButtons = document.querySelectorAll('button[id^="add-player"]');
-    const playerNames = [];
-    const saveButton = document.getElementById('save-team');
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    console.log("CSRF Token:", csrfToken);
+            const addButtons = document.querySelectorAll('button[id^="add-player"]');
+            const playerNames = [];
+            const saveButton = document.getElementById('save-team');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            console.log("CSRF Token:", csrfToken);  // Проверка токена
 
-    addButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log("Add button clicked");
+            addButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log("Add button clicked");
 
-            const index = button.id.split('-').pop();
-            const input = document.getElementById(`player-name-${index}`);
-            const playerName = input.value.trim();
+                    const index = button.id.split('-').pop();
+                    const input = document.getElementById(`player-name-${index}`);
+                    const playerName = input.value.trim();
 
-            if (playerName === '') {
-                console.log("Player name is empty");
-                return;
-            }
+                    if (playerName === '') {
+                        console.log("Player name is empty");
+                        return;
+                    }
 
-            fetch('{{ route('team.checkPlayers') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({ playerNames: [playerName] })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    fetch('{{ route('team.checkPlayers') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ playerNames: [playerName] })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.players && data.players[playerName]) {
+                            const player = data.players[playerName];
+                            player.matches = data.commonMatches;
+                            addPlayerToList(player, index);
+                            playerNames.push(player);
+                            button.disabled = true;
+                        } else {
+                            console.log("Player data not found in response");
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+
+            saveButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log("Save button clicked");
+
+                const teamName = document.getElementById('team-name').value.trim();
+
+                if (teamName === '' || playerNames.length < 2) {
+                    alert('Please enter a team name and add at least two players.');
+                    return;
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.players && data.players[playerName]) {
-                    const player = data.players[playerName];
-                    addPlayerToList(player, index);
-                    playerNames.push(player);
-                    button.disabled = true;
-                } else {
-                    console.log("Player data not found in response");
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    });
 
-    saveButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log("Save button clicked");
+                fetch('{{ route('team.save') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ teamName, players: playerNames })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert('Team saved successfully!');
+                    } else {
+                        alert('Error saving team.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
 
-        const teamName = document.getElementById('team-name').value.trim();
+            function addPlayerToList(player, index) {
+                console.log("Adding player to list", player);
 
-        if (teamName === '' || playerNames.length < 2) {
-            alert('Please enter a team name and add at least two players.');
-            return;
-        }
+                const listElement = document.createElement('li');
+                listElement.innerHTML = `
+                    <div class="player-details">
+                        <strong>${player.name}</strong> (${player.shardId})
+                        <button class="remove-player" data-index="${index}">Remove</button>
+                    </div>
+                `;
+                document.getElementById('players-list').appendChild(listElement);
 
-        fetch('{{ route('team.save') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ teamName, players: playerNames })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+                listElement.querySelector('.remove-player').addEventListener('click', function() {
+                    removePlayerFromList(this);
+                });
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                alert('Team saved successfully!');
-            } else {
-                alert('Error saving team.');
+
+            function removePlayerFromList(button) {
+                const index = button.getAttribute('data-index');
+                const listItem = button.closest('li');
+                listItem.remove();
+                document.getElementById(`add-player-${index}`).disabled = false;
+                document.getElementById(`player-name-${index}`).value = '';
+                playerNames.splice(index - 1, 1);
             }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-
-    function addPlayerToList(player, index) {
-        console.log("Adding player to list", player);
-
-        const listElement = document.createElement('li');
-        listElement.innerHTML = `
-            <div class="player-details">
-                <strong>${player.name}</strong> (${player.shardId})
-                <button class="remove-player" data-index="${index}">Remove</button>
-            </div>
-        `;
-        document.getElementById('players-list').appendChild(listElement);
-
-        listElement.querySelector('.remove-player').addEventListener('click', function() {
-            removePlayerFromList(this);
         });
-    }
-
-    function removePlayerFromList(button) {
-        const index = button.getAttribute('data-index');
-        const listItem = button.closest('li');
-        listItem.remove();
-        document.getElementById(`add-player-${index}`).disabled = false;
-        document.getElementById(`player-name-${index}`).value = '';
-        playerNames.splice(index - 1, 1);
-    }
-});
 
     </script>
 @endsection
