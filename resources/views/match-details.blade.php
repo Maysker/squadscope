@@ -10,6 +10,8 @@
                 <p>Duration: {{ $matchDetail['data']['attributes']['duration'] }} seconds</p>
                 <p>Game Mode: {{ $matchDetail['data']['attributes']['gameMode'] }}</p>
                 <p>Map: {{ $matchDetail['data']['attributes']['mapName'] }}</p>
+                <p>Match Type: {{ $matchDetail['data']['attributes']['matchType'] }}</p>
+                <p>Created At: {{ $matchDetail['data']['attributes']['createdAt'] }}</p>
                 <h3>Participants</h3>
                 <div class="participants">
                     @foreach ($matchDetail['included'] as $participant)
@@ -18,6 +20,17 @@
                                 <p>Player: {{ $participant['attributes']['stats']['name'] }}</p>
                                 <p>Kills: {{ $participant['attributes']['stats']['kills'] }}</p>
                                 <p>Damage: {{ $participant['attributes']['stats']['damageDealt'] }}</p>
+                                <p>Assists: {{ $participant['attributes']['stats']['assists'] }}</p>
+                                <p>Revives: {{ $participant['attributes']['stats']['revives'] }}</p>
+                                <p>Heals: {{ $participant['attributes']['stats']['heals'] }}</p>
+                                <p>Boosts: {{ $participant['attributes']['stats']['boosts'] }}</p>
+                                <p>Longest Kill: {{ $participant['attributes']['stats']['longestKill'] }}</p>
+                                <p>Headshot Kills: {{ $participant['attributes']['stats']['headshotKills'] }}</p>
+                                <p>Ride Distance: {{ $participant['attributes']['stats']['rideDistance'] }} meters</p>
+                                <p>Walk Distance: {{ $participant['attributes']['stats']['walkDistance'] }} meters</p>
+                                <p>Survived Time: {{ $participant['attributes']['stats']['timeSurvived'] }} seconds</p>
+                                <p>Kill Place: {{ $participant['attributes']['stats']['killPlace'] }}</p>
+                                <p>Win Place: {{ $participant['attributes']['stats']['winPlace'] }}</p>
                             </div>
                         @endif
                     @endforeach
