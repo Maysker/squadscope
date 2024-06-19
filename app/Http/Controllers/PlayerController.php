@@ -84,15 +84,15 @@ class PlayerController extends Controller
         $matches = PlayerMatch::select('match_id')
                     ->whereIn('player_id', function($query) use ($teamId) {
                         $query->select('id')
-                            ->from('players')
-                            ->where('team_id', $teamId);
+                              ->from('players')
+                              ->where('team_id', $teamId);
                     })
                     ->groupBy('match_id')
-                    ->havingRaw('COUNT(DISTINCT player_id) > 1')
-                    ->get();
-
+                    ->havingRaw('COUNT(DISTINCT player_id) > 1');
+    
         return $matches;
     }
+    
 
     public function getMatchDetails($matchId)
     {
@@ -106,22 +106,27 @@ class PlayerController extends Controller
 
     public function showMatchDetails($teamId)
     {
-        $matches = $this->getCommonMatches($teamId);
+        // Get the team members' names
+        $teamMembers = Player::where('team_id', $teamId)->pluck('name')->toArray();
+    
+        // Get the common matches and paginate
+        $matchesQuery = $this->getCommonMatches($teamId);
+        $paginatedMatches = $matchesQuery->paginate(6);
+    
         $matchDetails = [];
-        foreach ($matches as $match) {
+        foreach ($paginatedMatches as $match) {
             $matchDetail = $this->getMatchDetails($match->match_id);
             if ($matchDetail) {
                 $matchDetails[] = $matchDetail;
             }
         }
-
-        // Limit to the last 4 matches
-        $matchDetails = array_slice($matchDetails, 0, 4);
-
-        // Get team player names
-        $teamPlayers = Player::where('team_id', $teamId)->pluck('name')->toArray();
-
-        return view('match-details', ['matchDetails' => $matchDetails, 'teamPlayers' => $teamPlayers]);
+    
+        return view('match-details', [
+            'matchDetails' => $matchDetails,
+            'matches' => $paginatedMatches,
+            'teamId' => $teamId,
+            'teamMembers' => $teamMembers
+        ]);
     }
 
     public function saveTeam(Request $request)
