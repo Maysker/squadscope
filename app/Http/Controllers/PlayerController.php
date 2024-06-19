@@ -109,25 +109,46 @@ class PlayerController extends Controller
         // Get the team members' names
         $teamMembers = Player::where('team_id', $teamId)->pluck('name')->toArray();
     
-        // Get the common matches and paginate
+        // Get the common matches
         $matchesQuery = $this->getCommonMatches($teamId);
-        $paginatedMatches = $matchesQuery->paginate(6);
+        $matches = $matchesQuery->get(); // Retrieve all matches
     
+        // Sort matches by createdAt descending
+        $sortedMatches = $matches->sortByDesc(function ($match) {
+            return $this->getMatchDetails($match->match_id)['data']['attributes']['createdAt'];
+        })->values();
+    
+        // Paginate the sorted matches
+        $perPage = 6; // Number of matches per page
+        $currentPage = request()->query('page', 1); // Current page, default is 1
+    
+        $currentPageMatches = $sortedMatches->forPage($currentPage, $perPage);
+    
+        // Convert to array to fetch details
         $matchDetails = [];
-        foreach ($paginatedMatches as $match) {
+        foreach ($currentPageMatches as $match) {
             $matchDetail = $this->getMatchDetails($match->match_id);
             if ($matchDetail) {
                 $matchDetails[] = $matchDetail;
             }
         }
     
+        // Create paginator instance
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator($matchDetails, $sortedMatches->count(), $perPage, $currentPage, [
+            'path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+    
         return view('match-details', [
             'matchDetails' => $matchDetails,
-            'matches' => $paginatedMatches,
+            'matches' => $paginator,
             'teamId' => $teamId,
             'teamMembers' => $teamMembers
         ]);
     }
+    
+    
+    
 
     public function saveTeam(Request $request)
     {

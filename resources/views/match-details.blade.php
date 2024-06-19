@@ -6,12 +6,11 @@
     <div class="matches">
         @foreach ($matchDetails as $matchDetail)
             <div class="match-card">
-                <h2>Match ID: {{ $matchDetail['data']['id'] }}</h2>
+                <h2>Match Date: {{ $matchDetail['data']['attributes']['createdAt'] }}</h2>
                 <p>Duration: {{ $matchDetail['data']['attributes']['duration'] }} seconds</p>
                 <p>Game Mode: {{ $matchDetail['data']['attributes']['gameMode'] }}</p>
                 <p>Map: {{ $matchDetail['data']['attributes']['mapName'] }}</p>
                 <p>Match Type: {{ $matchDetail['data']['attributes']['matchType'] }}</p>
-                <p>Created At: {{ $matchDetail['data']['attributes']['createdAt'] }}</p>
                 <h3>Participants</h3>
                 <div class="participants">
                     @foreach ($matchDetail['included'] as $participant)
