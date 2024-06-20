@@ -4,7 +4,11 @@
 <div class="container">
     <h1>Match Statistics</h1>
     <div class="matches">
-        @foreach ($matchDetails as $matchDetail)
+        @php
+            // Convert $matchDetails array to a collection and then sort it
+            $sortedMatches = collect($matchDetails)->sortByDesc('data.attributes.createdAt');
+        @endphp
+        @foreach ($sortedMatches as $matchDetail)
             <div class="match-card">
                 <h2>Match Date: {{ $matchDetail['data']['attributes']['createdAt'] }}</h2>
                 <p>Duration: {{ $matchDetail['data']['attributes']['duration'] }} seconds</p>
@@ -17,19 +21,22 @@
                         @if ($participant['type'] === 'participant' && in_array($participant['attributes']['stats']['name'], $teamMembers))
                             <div class="participant-card">
                                 <p>Player: {{ $participant['attributes']['stats']['name'] }}</p>
-                                <p>Kills: {{ $participant['attributes']['stats']['kills'] }}</p>
-                                <p>Damage: {{ $participant['attributes']['stats']['damageDealt'] }}</p>
-                                <p>Assists: {{ $participant['attributes']['stats']['assists'] }}</p>
-                                <p>Revives: {{ $participant['attributes']['stats']['revives'] }}</p>
-                                <p>Heals: {{ $participant['attributes']['stats']['heals'] }}</p>
-                                <p>Boosts: {{ $participant['attributes']['stats']['boosts'] }}</p>
-                                <p>Longest Kill: {{ $participant['attributes']['stats']['longestKill'] }}</p>
-                                <p>Headshot Kills: {{ $participant['attributes']['stats']['headshotKills'] }}</p>
-                                <p>Ride Distance: {{ $participant['attributes']['stats']['rideDistance'] }} meters</p>
-                                <p>Walk Distance: {{ $participant['attributes']['stats']['walkDistance'] }} meters</p>
-                                <p>Survived Time: {{ $participant['attributes']['stats']['timeSurvived'] }} seconds</p>
-                                <p>Kill Place: {{ $participant['attributes']['stats']['killPlace'] }}</p>
-                                <p>Win Place: {{ $participant['attributes']['stats']['winPlace'] }}</p>
+                                <div class="details-hidden">
+                                    <p>Kills: {{ $participant['attributes']['stats']['kills'] }}</p>
+                                    <p>Damage: {{ $participant['attributes']['stats']['damageDealt'] }}</p>
+                                    <p>Assists: {{ $participant['attributes']['stats']['assists'] }}</p>
+                                    <p>Revives: {{ $participant['attributes']['stats']['revives'] }}</p>
+                                    <p>Heals: {{ $participant['attributes']['stats']['heals'] }}</p>
+                                    <p>Boosts: {{ $participant['attributes']['stats']['boosts'] }}</p>
+                                    <p>Longest Kill: {{ $participant['attributes']['stats']['longestKill'] }} meters</p>
+                                    <p>Headshot Kills: {{ $participant['attributes']['stats']['headshotKills'] }}</p>
+                                    <p>Ride Distance: {{ $participant['attributes']['stats']['rideDistance'] }} meters</p>
+                                    <p>Walk Distance: {{ $participant['attributes']['stats']['walkDistance'] }} meters</p>
+                                    <p>Survived Time: {{ $participant['attributes']['stats']['timeSurvived'] }} seconds</p>
+                                    <p>Kill Place: {{ $participant['attributes']['stats']['killPlace'] }}</p>
+                                    <p>Win Place: {{ $participant['attributes']['stats']['winPlace'] }}</p>
+                                </div>
+                                <button class="see-more-btn" onclick="toggleDetails(this)">See More</button>
                             </div>
                         @endif
                     @endforeach
@@ -63,24 +70,30 @@
         padding-top: 10px;
         margin-top: 10px;
     }
-    .pagination {
-        margin-top: 20px;
-        text-align: center;
+    .details-hidden {
+        display: none; /* Initially hide details */
     }
-    .pagination .page-link {
-        margin: 0 5px;
-        padding: 5px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        text-decoration: none;
-    }
-    .pagination .page-link:hover {
-        background-color: #f0f0f0;
-    }
-    .pagination .page-item.active .page-link {
+    .see-more-btn {
+        margin-top: 10px;
+        cursor: pointer;
         background-color: #007bff;
         color: white;
-        border-color: #007bff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
     }
 </style>
+
+<script>
+    function toggleDetails(button) {
+        const detailsDiv = button.previousElementSibling;
+        if (detailsDiv.style.display === "none") {
+            detailsDiv.style.display = "block";
+            button.textContent = "See Less";
+        } else {
+            detailsDiv.style.display = "none";
+            button.textContent = "See More";
+        }
+    }
+</script>
 @endsection
