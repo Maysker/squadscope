@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Match Statistics</h1>
+    <h1 class="page-title">Match Statistics</h1>
     <div class="matches">
         @php
             // Convert $matchDetails array to a collection and then sort it
@@ -50,17 +50,36 @@
 </div>
 
 <style>
+    .container {
+        background-color: #595858
+    }
+
+    .page-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 36px;
+        text-align: center;
+        color: #ffc107;
+        margin-bottom: 30px;
+    }
     .matches {
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
+        justify-content: center;
     }
     .match-card {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 16px;
-        width: calc(33.333% - 20px);
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        width: calc(33.333% - 20px);
+        margin-bottom: 20px;
+    }
+    .match-card h2, .match-card h3 {
+        color: #ffc107;
+    }
+    .match-card p {
+        color: #fff;
     }
     .participants {
         margin-top: 10px;
@@ -76,11 +95,14 @@
     .see-more-btn {
         margin-top: 10px;
         cursor: pointer;
-        background-color: #007bff;
-        color: white;
+        background-color: #ffc107;
+        color: rgb(10, 0, 0);
         border: none;
         padding: 8px 16px;
         border-radius: 4px;
+    }
+    .see-more-btn:hover {
+        background-color: #e6b006;
     }
 </style>
 

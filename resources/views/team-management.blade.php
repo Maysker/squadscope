@@ -1,10 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="team-management-container">
+    <div class="row team-management-container">
         <div class="team-form-container">
             <div class="team-form">
-                <h2><img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Check Your Team Icon">Create your team</h2>
+                <h2>
+                    <img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Check Your Team Icon">
+                    Create Your Squad
+                </h2>
                 
                 <div class="team-name-input">
                     <input type="text" id="team-name" placeholder="Team name" required>
@@ -24,7 +27,8 @@
 
         <div class="your-teams-container">
             <div class="your-teams">
-                <h2>Your Teams</h2>
+                <h2>
+                    <img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Your Squads Icon">Your Squads</h2>
                 <ul>
                     @foreach($userTeams as $team)
                     <li>
@@ -35,13 +39,13 @@
                             @endforeach
                         </ul>
                         <!-- Button to see statistics -->
-                        <a href="{{ route('team.matches', $team->id) }}" class="btn btn-primary btn-sm">See Statistics</a>
+                        <a href="{{ route('team.matches', $team->id) }}" class="statistics-button">See Statistics</a>
         
                         <!-- Delete form -->
                         <form action="{{ route('teams.destroy', $team) }}" method="POST" style="display: inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="submit" class="delete-button">Delete Squad</button>
                         </form>
                     </li>
                     @endforeach
@@ -158,6 +162,5 @@
                 playerNames.splice(index - 1, 1);
             }
         });
-
     </script>
 @endsection
