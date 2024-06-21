@@ -185,4 +185,31 @@ class PlayerController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function showTeamManagement()
+    {
+        // Fetch teams where owner_id matches authenticated user's id
+        $userTeams = Team::where('owner_id', auth()->id())->get();
+
+        return view('team-management', [
+            'userTeams' => $userTeams
+        ]);
+    }
+
+    public function showUserTeams()
+    {
+        // Fetch teams owned by the authenticated user
+        $userTeams = Team::where('owner_id', auth()->id())->with('players')->get();
+
+        return view('team-management', [
+            'userTeams' => $userTeams,
+        ]);
+    }
+
+    public function destroy(Team $team)
+    {
+        $team->delete();
+        
+        return redirect()->back()->with('success', 'Team deleted successfully.');
+    }
 }

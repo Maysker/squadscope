@@ -1,3 +1,4 @@
+
 .team-form-container {
     margin-left: 220px; /* Add margin to separate from the flight board */
     width: 100%;
@@ -58,7 +59,6 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
 
 .team-name-input {
     margin-bottom: 10px;
@@ -130,4 +130,59 @@
 
 .remove-player:hover {
     background-color: #ff1a1a;
+}
+
+.your-teams-container {
+    margin-left: 20px;
+    width: 100%;
+    max-width: 400px;
+    z-index: 3;
+    margin-top: 20px;
+}
+
+.your-teams {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.your-teams h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ffc107;
+    margin-top: 10px;
+}
+
+.your-teams ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.your-teams ul li {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.your-teams ul li strong {
+    color: #ffc107;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.your-teams ul li ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 5px;
+}
+
+.your-teams ul li ul li {
+    color: #fff;
 }
