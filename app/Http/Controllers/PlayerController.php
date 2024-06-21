@@ -113,9 +113,18 @@ class PlayerController extends Controller
         $matchesQuery = $this->getCommonMatches($teamId);
         $matches = $matchesQuery->get(); // Retrieve all matches
     
+        // Filter out matches where not all team members participated
+        $matchDetails = collect();
+        foreach ($matches as $match) {
+            $matchDetail = $this->getMatchDetails($match->match_id);
+            if ($this->allTeamMembersPresentInMatch($matchDetail['included'], $teamMembers)) {
+                $matchDetails->push($matchDetail);
+            }
+        }
+    
         // Sort matches by createdAt descending
-        $sortedMatches = $matches->sortByDesc(function ($match) {
-            return $this->getMatchDetails($match->match_id)['data']['attributes']['createdAt'];
+        $sortedMatches = $matchDetails->sortByDesc(function ($match) {
+            return $match['data']['attributes']['createdAt'];
         })->values();
     
         // Paginate the sorted matches
@@ -124,28 +133,33 @@ class PlayerController extends Controller
     
         $currentPageMatches = $sortedMatches->forPage($currentPage, $perPage);
     
-        // Convert to array to fetch details
-        $matchDetails = [];
-        foreach ($currentPageMatches as $match) {
-            $matchDetail = $this->getMatchDetails($match->match_id);
-            if ($matchDetail) {
-                $matchDetails[] = $matchDetail;
-            }
-        }
-    
         // Create paginator instance
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator($matchDetails, $sortedMatches->count(), $perPage, $currentPage, [
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator($currentPageMatches, $sortedMatches->count(), $perPage, $currentPage, [
             'path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
             'pageName' => 'page',
         ]);
     
         return view('match-details', [
-            'matchDetails' => $matchDetails,
+            'matchDetails' => $currentPageMatches,
             'matches' => $paginator,
             'teamId' => $teamId,
             'teamMembers' => $teamMembers
         ]);
     }
+    
+    /**
+     * Check if all team members are present in the given match.
+     *
+     * @param array $participants Participants data from the match.
+     * @param array $teamMembers  Team members' names.
+     * @return bool True if all team members are present; false otherwise.
+     */
+    private function allTeamMembersPresentInMatch($participants, $teamMembers)
+    {
+        $participantNames = collect($participants)->pluck('attributes.stats.name')->toArray();
+        return count(array_intersect($teamMembers, $participantNames)) === count($teamMembers);
+    }
+    
     
     
     

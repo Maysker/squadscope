@@ -34,6 +34,10 @@
                             <li>{{ $player->name }}</li>
                             @endforeach
                         </ul>
+                        <!-- Button to see statistics -->
+                        <a href="{{ route('team.matches', $team->id) }}" class="btn btn-primary btn-sm">See Statistics</a>
+        
+                        <!-- Delete form -->
                         <form action="{{ route('teams.destroy', $team) }}" method="POST" style="display: inline;">
                             @csrf
                             @method('DELETE')
