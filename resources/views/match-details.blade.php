@@ -36,11 +36,11 @@
                                     <p>Kill Place: {{ $participant['attributes']['stats']['killPlace'] }}</p>
                                     <p>Win Place: {{ $participant['attributes']['stats']['winPlace'] }}</p>
                                 </div>
-                                <button class="see-more-btn" onclick="toggleDetails(this)">See More</button>
                             </div>
                         @endif
                     @endforeach
                 </div>
+                <button class="see-more-btn" onclick="toggleDetails(this)">Show Details</button>
             </div>
         @endforeach
     </div>
@@ -51,7 +51,7 @@
 
 <style>
     .container {
-        background-color: #595858
+        background-color: #595858;
     }
 
     .page-title {
@@ -108,14 +108,12 @@
 
 <script>
     function toggleDetails(button) {
-        const detailsDiv = button.previousElementSibling;
-        if (detailsDiv.style.display === "none") {
-            detailsDiv.style.display = "block";
-            button.textContent = "See Less";
-        } else {
-            detailsDiv.style.display = "none";
-            button.textContent = "See More";
-        }
+        const participantCards = button.previousElementSibling.querySelectorAll('.details-hidden');
+        const isDetailsVisible = Array.from(participantCards).some(detailsDiv => detailsDiv.style.display === "block");
+        participantCards.forEach(detailsDiv => {
+            detailsDiv.style.display = isDetailsVisible ? "none" : "block";
+        });
+        button.textContent = isDetailsVisible ? "Show Details" : "Hide Details";
     }
 </script>
 @endsection
