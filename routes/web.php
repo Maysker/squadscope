@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\TeamStatisticsController;
 
 Route::get('/team-management', function () {
     return view('team-management');
@@ -9,6 +10,7 @@ Route::get('/team-management', function () {
 
 Route::post('/check-players', [PlayerController::class, 'checkPlayers'])->name('team.checkPlayers');
 Route::post('/save-team', [PlayerController::class, 'saveTeam'])->name('team.save');
+Route::get('/team/{teamId}/statistics', [TeamStatisticsController::class, 'getTeamStatistics']);
 
 Route::view('/', 'welcome');
 
