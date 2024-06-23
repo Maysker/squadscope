@@ -35,7 +35,6 @@
                                     <p>Survived Time: {{ $participant['attributes']['stats']['timeSurvived'] }} seconds</p>
                                     <p>Kill Place: {{ $participant['attributes']['stats']['killPlace'] }}</p>
                                     <p>Win Place: {{ $participant['attributes']['stats']['winPlace'] }}</p>
-                                    <button id="showHeatmapBtn" class="heatmap-btn">Show Heatmap</button>
                                 </div>
                             </div>
 
@@ -48,13 +47,6 @@
     </div>
     <div class="pagination">
         {{ $matches->links() }}
-    </div>
-    <div id="heatmapModal" class="modal">
-        <div class="modal-content">
-            <span id="closeHeatmapBtn">&times;</span>
-            <h2>Heatmap</h2>
-            <!-- Heatmap will be displayed here -->
-        </div>
     </div>
     
 </div>
@@ -114,18 +106,6 @@
     .see-more-btn:hover {
         background-color: #e6b006;
     }
-    .heatmap-btn {
-        margin-top: 10px;
-        cursor: pointer;
-        background-color: #ffc107;
-        color: rgb(10, 0, 0);
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-    }
-    .heatmap-btn:hover {
-        background-color: #e6b006;
-    }
     .modal {
         display: none; /* Hidden by default */
         position: fixed; /* Stay in place */
@@ -158,20 +138,5 @@
         });
         button.textContent = isDetailsVisible ? "Show Details" : "Hide Details";
     }
-    document.getElementById("showHeatmapBtn").onclick = function() {
-        document.getElementById("heatmapModal").style.display = "block";
-    }
-
-    document.getElementById("closeHeatmapBtn").onclick = function() {
-        document.getElementById("heatmapModal").style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-        if (event.target == document.getElementById("heatmapModal")) {
-            document.getElementById("heatmapModal").style.display = "none";
-        }
-    }
-
 </script>
 @endsection
