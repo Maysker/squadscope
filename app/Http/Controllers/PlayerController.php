@@ -79,6 +79,86 @@ class PlayerController extends Controller
         return $firstPlayerMatches;
     }
 
+    public function getCommonMatches($teamId)
+    {
+        $matches = PlayerMatch::select('match_id')
+                    ->whereIn('player_id', function($query) use ($teamId) {
+                        $query->select('id')
+                              ->from('players')
+                              ->where('team_id', $teamId);
+                    })
+                    ->groupBy('match_id')
+                    ->havingRaw('COUNT(DISTINCT player_id) > 1');
+    
+        return $matches;
+    }
+    
+    public function getMatchDetails($matchId)
+    {
+        $response = $this->client->request('GET', "shards/steam/matches/{$matchId}");
+        if ($response->getStatusCode() != 200) {
+            return null;
+        }
+        $data = json_decode($response->getBody()->getContents(), true);
+        return $data;
+    }
+
+    public function showMatchDetails($teamId)
+    {
+        // Get the team members' names
+        $teamMembers = Player::where('team_id', $teamId)->pluck('name')->toArray();
+    
+        // Get the common matches
+        $matchesQuery = $this->getCommonMatches($teamId);
+        $matches = $matchesQuery->get(); // Retrieve all matches
+    
+        // Filter out matches where not all team members participated
+        $matchDetails = collect();
+        foreach ($matches as $match) {
+            $matchDetail = $this->getMatchDetails($match->match_id);
+            if ($this->allTeamMembersPresentInMatch($matchDetail['included'], $teamMembers)) {
+                $matchDetails->push($matchDetail);
+            }
+        }
+    
+        // Sort matches by createdAt descending
+        $sortedMatches = $matchDetails->sortByDesc(function ($match) {
+            return $match['data']['attributes']['createdAt'];
+        })->values();
+    
+        // Paginate the sorted matches
+        $perPage = 6; // Number of matches per page
+        $currentPage = request()->query('page', 1); // Current page, default is 1
+    
+        $currentPageMatches = $sortedMatches->forPage($currentPage, $perPage);
+    
+        // Create paginator instance
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator($currentPageMatches, $sortedMatches->count(), $perPage, $currentPage, [
+            'path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+    
+        return view('match-details', [
+            'matchDetails' => $currentPageMatches,
+            'matches' => $paginator,
+            'teamId' => $teamId,
+            'teamMembers' => $teamMembers
+        ]);
+    }
+    
+    /**
+     * Check if all team members are present in the given match.
+     *
+     * @param array $participants Participants data from the match.
+     * @param array $teamMembers  Team members' names.
+     * @return bool True if all team members are present; false otherwise.
+     */
+    private function allTeamMembersPresentInMatch($participants, $teamMembers)
+    {
+        $participantNames = collect($participants)->pluck('attributes.stats.name')->toArray();
+        return count(array_intersect($teamMembers, $participantNames)) === count($teamMembers);
+    }
+
     public function saveTeam(Request $request)
     {
         $validated = $request->validate([
@@ -113,5 +193,32 @@ class PlayerController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function showTeamManagement()
+    {
+        // Fetch teams where owner_id matches authenticated user's id
+        $userTeams = Team::where('owner_id', auth()->id())->get();
+
+        return view('team-management', [
+            'userTeams' => $userTeams
+        ]);
+    }
+
+    public function showUserTeams()
+    {
+        // Fetch teams owned by the authenticated user
+        $userTeams = Team::where('owner_id', auth()->id())->with('players')->get();
+
+        return view('team-management', [
+            'userTeams' => $userTeams,
+        ]);
+    }
+
+    public function destroy(Team $team)
+    {
+        $team->delete();
+        
+        return redirect()->back()->with('success', 'Team deleted successfully.');
     }
 }
