@@ -1,6 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        $teamId = optional(auth()->user()->teams()->first())->id;
+    @endphp
+    <div class="bg-white shadow mb-4">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <nav class="flex space-x-4">
+            <a href="{{ route('team.management') }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Team</a>
+            @if ($teamId)
+                <a href="{{ route('team.statistics', ['teamId' => $teamId]) }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Statistics</a>
+                <a href="{{ route('team.matches', ['teamId' => $teamId]) }}" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Matches</a>
+            @endif
+        </nav>
+        </div>
+    </div>
 <div class="container">
     <h1 class="page-title">Match Statistics</h1>
     <div class="matches">
@@ -61,6 +75,8 @@
 <style>
     .container {
         background-color: #595858;
+        border-radius: 10px;
+        margin-top: 20px;
     }
 
     .page-title {

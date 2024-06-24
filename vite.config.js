@@ -6,8 +6,8 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/css/team-management.css',
                 'resources/js/app.js',
+                'resources/css/team-management.css'
             ],
             refresh: true,
         }),

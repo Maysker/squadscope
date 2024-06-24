@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Squad Scope') }}</title>
+    <title>{{ config('Squad Scope', 'Squad Scope') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -16,26 +16,32 @@
     @livewireStyles
 </head>
 <body class="font-sans antialiased">
-
     <div class="min-h-screen bg-gray-100">
         <livewire:layout.navigation />
-
-        <!-- Conditional Dashboard Link -->
-        @if (!request()->routeIs('dashboard'))
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <a href="{{ route('dashboard') }}" class="text-lg font-semibold text-gray-800 hover:text-gray-600">
-                        {{ __('Dashboard') }}
-                    </a>
-                </div>
-            </header>
-        @endif
 
         <!-- Page Heading -->
         @if (isset($header))
             <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                     {{ $header }}
+                    <nav class="flex space-x-4">
+                        <x-nav-link :href="route('team.management')" :active="request()->routeIs('team.management')">
+                            {{ __('Team') }}
+                        </x-nav-link>
+                        @if (Auth::check())
+                            @php
+                                $teamId = Auth::user()->teams()->first()?->id;
+                            @endphp
+                            @if ($teamId)
+                                <x-nav-link :href="route('team.statistics', ['teamId' => $teamId])" :active="request()->routeIs('team.statistics')">
+                                    {{ __('Statistics') }}
+                                </x-nav-link>
+                                <x-nav-link :href="route('team.matches', ['teamId' => $teamId])" :active="request()->routeIs('team.matches')">
+                                    {{ __('Matches') }}
+                                </x-nav-link>
+                            @endif
+                        @endif
+                    </nav>
                 </div>
             </header>
         @endif
@@ -43,6 +49,7 @@
         <!-- Page Content -->
         <main>
             @yield('content')
+            {{ $slot ?? '' }}
         </main>
     </div>
 

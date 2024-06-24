@@ -1,1 +1,1 @@
-<img src="{{ asset('images/logo.png') }}" style="width: auto; height: 80px;" {{ $attributes }} alt="Squad Scope Logo">
+<img src="{{ asset('images/logo.png') }}" style="width: auto; height: 38px;" {{ $attributes }} alt="Squad Scope Logo">
