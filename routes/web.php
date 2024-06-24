@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MatchReportController;
 use App\Http\Controllers\PlayerController;
 
 Route::get('/team-management', function () {
@@ -29,5 +30,8 @@ Route::view('dashboard', 'dashboard')
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::post('/match-report', [MatchReportController::class, 'generateReport'])->name('match.report');
+
 
 require __DIR__.'/auth.php';

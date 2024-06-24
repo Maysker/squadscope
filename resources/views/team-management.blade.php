@@ -39,7 +39,7 @@
                             @endforeach
                         </ul>
                         <!-- Button to see statistics -->
-                        <a href="{{ route('team.matches', $team->id) }}" class="statistics-button">See Statistics</a>
+                        <a href="{{ route('team.matches', $team->id) }}" class="statistics-button">See Match Details</a>
         
                         <!-- Delete form -->
                         <form action="{{ route('teams.destroy', $team) }}" method="POST" style="display: inline;">

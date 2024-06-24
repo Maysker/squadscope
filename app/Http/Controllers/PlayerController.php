@@ -93,7 +93,6 @@ class PlayerController extends Controller
         return $matches;
     }
     
-
     public function getMatchDetails($matchId)
     {
         $response = $this->client->request('GET', "shards/steam/matches/{$matchId}");
@@ -159,10 +158,6 @@ class PlayerController extends Controller
         $participantNames = collect($participants)->pluck('attributes.stats.name')->toArray();
         return count(array_intersect($teamMembers, $participantNames)) === count($teamMembers);
     }
-    
-    
-    
-    
 
     public function saveTeam(Request $request)
     {
