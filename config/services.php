@@ -23,6 +23,10 @@ return [
     'base_uri' => 'https://api.pubg.com/shards/steam/players'
     ],
 
+    'claude' => [
+        'api_key' => env('CLAUDE_API_KEY'),
+        ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

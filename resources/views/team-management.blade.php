@@ -1,23 +1,56 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="team-form-container">
-        <div class="team-form">
-            <h2><img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Check Your Team Icon">Create your team</h2>
-            
-            <div class="team-name-input">
-                <input type="text" id="team-name" placeholder="Team name" required>
-            </div>
-            
-            @for ($i = 1; $i <= 4; $i++)
-                <div class="player-input">
-                    <input type="text" id="player-name-{{ $i }}" placeholder="Player name">
-                    <button id="add-player-{{ $i }}">Add</button>
+    <div class="row team-management-container">
+        <div class="team-form-container">
+            <div class="team-form">
+                <h2>
+                    <img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Check Your Team Icon">
+                    Create Your Squad
+                </h2>
+                
+                <div class="team-name-input">
+                    <input type="text" id="team-name" placeholder="Team name" required>
                 </div>
-            @endfor
-            
-            <button class="save-button" id="save-team">Save Team</button>
-            <ul id="players-list"></ul>
+                
+                @for ($i = 1; $i <= 4; $i++)
+                    <div class="player-input">
+                        <input type="text" id="player-name-{{ $i }}" placeholder="Player name">
+                        <button id="add-player-{{ $i }}">Add</button>
+                    </div>
+                @endfor
+                
+                <button class="save-button" id="save-team">Save Team</button>
+                <ul id="players-list"></ul>
+            </div>
+        </div>
+
+        <div class="your-teams-container">
+            <div class="your-teams">
+                <h2>
+                    <img src="https://www.svgrepo.com/show/303582/pubg-1-logo.svg" class="team-form-icon" alt="Your Squads Icon">Your Squads</h2>
+                <ul>
+                    @foreach($userTeams as $team)
+                    <li>
+                        <strong>{{ $team->name }}</strong>
+                        <ul>
+                            @foreach($team->players as $player)
+                            <li>{{ $player->name }}</li>
+                            @endforeach
+                        </ul>
+                        <!-- Button to see statistics -->
+                        <a href="{{ route('team.matches', $team->id) }}" class="statistics-button">See Match Details</a>
+        
+                        <!-- Delete form -->
+                        <form action="{{ route('teams.destroy', $team) }}" method="POST" style="display: inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="delete-button">Delete Squad</button>
+                        </form>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
     </div>
     <script>
@@ -129,6 +162,5 @@
                 playerNames.splice(index - 1, 1);
             }
         });
-
     </script>
 @endsection
