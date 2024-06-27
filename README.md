@@ -1,4 +1,4 @@
-<p align="center"><a href="https://github.com/Maysker/bitcoin-trackerV2" target="_blank"><img src="https://raw.githubusercontent.com/Maysker/squadscope/master/public/images/logo.png" width="500" alt="Squad Scope Logo"></a></p>
+<p align="center"><a href="https://github.com/Maysker/squadscope" target="_blank"><img src="https://raw.githubusercontent.com/Maysker/squadscope/master/public/images/logo.png" width="500" alt="Squad Scope Logo"></a></p>
 
 # Squad Scope
 
